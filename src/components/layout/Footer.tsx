@@ -1,11 +1,9 @@
 
 export const Footer = () => {
   return (
-    <footer className="bg-elder-dark text-white py-6">
+    <footer className="bg-black/80 text-gray-400 py-4 text-center text-sm">
       <div className="container mx-auto px-4">
-        <div className="text-center">
-          <p className="text-elder-base">© {new Date().getFullYear()} Elder Voice Link. All rights reserved.</p>
-        </div>
+        <p>© {new Date().getFullYear()} Elder Voice Link</p>
       </div>
     </footer>
   );
