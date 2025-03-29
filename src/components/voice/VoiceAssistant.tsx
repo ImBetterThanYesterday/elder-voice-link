@@ -85,7 +85,8 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
     },
     onError: (error) => {
       console.error('Error in conversation:', error);
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+      // Fix the TypeScript error by ensuring error is properly handled without instanceof
+      const errorMessage = error ? (typeof error === 'object' && 'message' in error ? error.message : 'An error occurred') : 'An error occurred';
       setSubtitleText('Error: ' + errorMessage);
     }
   });
@@ -110,11 +111,17 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
     setSubtitleText('Conversation ended');
   }, [conversation]);
 
+  // Used for the interactive circle
+  const isConnected = conversation.status === 'connected';
+  const gradientClass = isConnected ? 
+    'bg-gradient-to-r from-lime-400 to-teal-300' :
+    'bg-gradient-to-r from-blue-400 to-purple-600';
+
   return (
     <div className={`voice-assistant-container flex flex-col items-center ${className || ''}`}>
       <div className="w-full max-w-xl mx-auto flex flex-col items-center space-y-6">
         {/* Status indicator */}
-        <div className="inline-flex items-center bg-lime-400 text-black text-sm px-3 py-1 rounded-full font-medium">
+        <div className="inline-flex items-center bg-lime-400 text-black text-sm px-3 py-1 rounded-full font-medium absolute top-4">
           <span className={`w-2 h-2 rounded-full mr-2 ${conversation.status === 'connected' ? 'bg-green-900' : 'bg-black'}`}></span>
           {conversation.status === 'connected' 
             ? (conversation.isSpeaking ? 'Speaking...' : 'Listening...') 
@@ -122,7 +129,7 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
         </div>
         
         {/* Chat history / transcript area */}
-        <div className="w-full bg-black/80 rounded-lg p-4 min-h-[200px] max-h-[300px] overflow-y-auto">
+        <div className="w-full bg-black/80 rounded-lg p-4 min-h-[200px] max-h-[300px] overflow-y-auto mb-4">
           {chatHistory.length === 0 ? (
             <p className="text-gray-400 text-center">Your conversation will appear here</p>
           ) : (
@@ -150,21 +157,29 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
           )}
         </div>
         
-        {/* Mic activation button - positioned clearly separate from transcript */}
-        <div className="mt-6 flex justify-center">
-          <button 
-            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
-              conversation.status === 'connected' ? 'bg-red-500 text-white' : 'bg-lime-400 text-black'
-            } shadow-lg hover:scale-105 active:scale-95`}
+        {/* Interactive Circle for mic activation */}
+        <div className="relative flex justify-center items-center">
+          <div 
+            className={`w-40 h-40 rounded-full ${gradientClass} flex items-center justify-center transition-all duration-300 cursor-pointer relative shadow-[0_0_15px_rgba(101,255,120,0.5)]`}
             onClick={conversation.status === 'connected' ? stopConversation : startConversation}
             aria-label={conversation.status === 'connected' ? "Stop conversation" : "Start conversation"}
           >
-            {conversation.status === 'connected' ? <MicOff size={26} /> : <Mic size={26} />}
-          </button>
+            <div className="absolute inset-0 rounded-full border-4 border-black/20"></div>
+            <div className="text-center">
+              {conversation.status === 'connected' ? (
+                <MicOff size={40} className="text-white mb-1" />
+              ) : (
+                <Mic size={40} className="text-white mb-1" />
+              )}
+            </div>
+            <div className="absolute -top-8 bg-lime-400 text-black text-sm px-3 py-1 rounded-full font-medium">
+              {conversation.status === 'connected' ? 'Connected' : 'Disconnected'}
+            </div>
+          </div>
         </div>
         
         {/* Current message/subtitle display */}
-        <div className="w-full text-center">
+        <div className="w-full text-center mt-4">
           <p className="text-xl font-medium text-white">
             {subtitleText || 'Press the microphone to talk'}
           </p>
