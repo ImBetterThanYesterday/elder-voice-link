@@ -14,7 +14,7 @@ const Index = () => {
             Elder Voice Link
           </h1>
           <p className="text-elder-base max-w-xs mx-auto text-gray-300">
-            Your voice assistant companion
+            Tu asistente de voz personal
           </p>
         </section>
 
