@@ -13,6 +13,7 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const widgetRef = useRef<HTMLElement | null>(null);
+  const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY || '';
   
   useEffect(() => {
     // Setup event listeners for the ElevenLabs widget
@@ -26,6 +27,7 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
           
           // Listen to widget events
           widgetElement.addEventListener('message', (event: any) => {
+            console.log('Widget event received:', event.detail);
             // Handle events from the widget
             const message = event.detail;
             
@@ -38,6 +40,13 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
               setIsListening(true);
               setSubtitleText('Listening...');
             } else if (message.type === 'listeningEnd') {
+              setIsListening(false);
+            } else if (message.type === 'ready') {
+              console.log('ElevenLabs widget is ready');
+              toast.success("Voice assistant is ready!");
+            } else if (message.type === 'error') {
+              console.error('ElevenLabs widget error:', message);
+              toast.error("Error: " + (message.message || 'Unknown error'));
               setIsListening(false);
             }
           });
@@ -61,13 +70,16 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
     try {
       if (isListening) {
         // If already listening, stop listening
+        console.log('Stopping listening...');
         widgetRef.current.dispatchEvent(new CustomEvent('stopListening'));
         setIsListening(false);
       } else {
         // Request microphone access first
+        console.log('Requesting microphone access...');
         navigator.mediaDevices.getUserMedia({ audio: true })
           .then(() => {
             // Start listening
+            console.log('Starting listening...');
             widgetRef.current?.dispatchEvent(new CustomEvent('startListening'));
             setIsListening(true);
           })
@@ -82,6 +94,10 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
     }
   };
 
+  const handleOrbClick = () => {
+    handleMicrophoneClick();
+  };
+
   const handleMessageClick = () => {
     // Show conversation history or open a chat panel
     toast.info("Message history feature coming soon!");
@@ -89,22 +105,31 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
 
   return (
     <div className={`voice-assistant-container flex flex-col items-center ${className || ''}`}>
-      {/* Hide the actual ElevenLabs widget but keep it functional */}
-      <elevenlabs-convai 
-        agent-id={agentId} 
-        className="hidden"
-      ></elevenlabs-convai>
+      {/* Widget with API key */}
+      {apiKey ? (
+        <elevenlabs-convai 
+          agent-id={agentId}
+          api-key={apiKey}
+          className="hidden"
+        ></elevenlabs-convai>
+      ) : (
+        <div className="hidden">
+          {toast.error("ElevenLabs API key is missing. Please add it to your .env file.")}
+        </div>
+      )}
       
       {/* Modern interface inspired by the provided image */}
       <div className="relative flex flex-col items-center w-full max-w-sm mx-auto">
         {/* Gradient orb visualization */}
-        <div className={`relative w-64 h-64 rounded-full mb-8 transition-all duration-500 ${isListening || isSpeaking ? 'scale-110' : 'scale-100'}`}>
+        <div 
+          className={`relative w-64 h-64 rounded-full mb-8 transition-all duration-500 ${isListening || isSpeaking ? 'scale-110' : 'scale-100'}`}
+          onClick={handleOrbClick}
+        >
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-blue-400 to-teal-300 rounded-full blur-sm"></div>
           <div className="absolute inset-1 bg-gradient-to-tr from-fuchsia-400 via-blue-500 to-teal-400 rounded-full"></div>
           
           <div 
             className={`absolute inset-0 flex items-center justify-center rounded-full ${isListening ? 'animate-pulse' : ''} cursor-pointer`}
-            onClick={handleMicrophoneClick}
           >
             <div className="w-[95%] h-[95%] bg-black rounded-full flex items-center justify-center">
               <div className={`w-full h-full bg-gradient-to-bl from-violet-500 via-indigo-400 to-teal-300 rounded-full opacity-90 flex items-center justify-center transition-all duration-700 ${isListening ? 'animate-pulse scale-[0.97]' : 'scale-[0.92]'}`}>
@@ -141,9 +166,9 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
         </div>
         
         {/* Large subtitle display for the elderly */}
-        <div className={`subtitles-container mt-6 p-4 bg-black/80 text-white rounded-lg w-full max-w-md transition-all duration-300 ${(isSpeaking || isListening) ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`subtitles-container mt-6 p-4 bg-black/80 text-white rounded-lg w-full max-w-md transition-all duration-300 ${(isSpeaking || isListening || subtitleText) ? 'opacity-100' : 'opacity-0'}`}>
           <p className="text-2xl text-center font-medium">
-            {subtitleText}
+            {subtitleText || (isListening ? 'Listening...' : (isSpeaking ? 'Speaking...' : ''))}
           </p>
         </div>
       </div>
