@@ -3,7 +3,8 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import VoiceAssistant from "@/components/voice/VoiceAssistant";
 
 const Index = () => {
-  // ElevenLabs Agent ID
+  // ElevenLabs API Key y Agent ID
+  const apiKey = "sk_aa411f2193444210a029eaa80ed22864d3928c3d22bd324a";
   const agentId = "vOT8ib1IlJTnHikNtiN7";
 
   return (
@@ -14,12 +15,16 @@ const Index = () => {
             Elder Voice Link
           </h1>
           <p className="text-elder-base max-w-xs mx-auto text-gray-300">
-            Your voice assistant companion
+            Tu asistente de voz personal
           </p>
         </section>
 
         <section className="w-full max-w-md">
-          <VoiceAssistant agentId={agentId} className="mb-8" />
+          <VoiceAssistant 
+            agentId={agentId} 
+            apiKey={apiKey} 
+            className="mb-8" 
+          />
         </section>
       </div>
     </MainLayout>
