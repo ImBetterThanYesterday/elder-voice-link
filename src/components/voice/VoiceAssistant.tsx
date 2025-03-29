@@ -1,6 +1,6 @@
 
 import { useCallback, useState } from 'react';
-import { Mic, MicOff, MessageSquare } from 'lucide-react';
+import { Mic, MicOff } from 'lucide-react';
 import { useConversation } from '@11labs/react';
 
 interface Message {
@@ -150,16 +150,26 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
           )}
         </div>
         
-        {/* Mic activation button - positioned clearly separate from transcript */}
-        <div className="mt-6 flex justify-center">
+        {/* Circle microphone button with gradient design */}
+        <div className="mt-6 flex justify-center relative">
           <button 
-            className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
-              conversation.status === 'connected' ? 'bg-red-500 text-white' : 'bg-lime-400 text-black'
-            } shadow-lg hover:scale-105 active:scale-95`}
+            className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg relative
+              ${conversation.status === 'connected' ? 
+                'bg-gradient-to-r from-red-500 to-red-400 text-white' : 
+                'bg-gradient-to-r from-lime-400 to-teal-300 text-black'}`}
             onClick={conversation.status === 'connected' ? stopConversation : startConversation}
             aria-label={conversation.status === 'connected' ? "Stop conversation" : "Start conversation"}
           >
-            {conversation.status === 'connected' ? <MicOff size={26} /> : <Mic size={26} />}
+            {/* Add a glow effect */}
+            <div className={`absolute inset-0 rounded-full blur-md opacity-50
+              ${conversation.status === 'connected' ? 
+                'bg-gradient-to-r from-red-500 to-red-400' : 
+                'bg-gradient-to-r from-lime-400 to-teal-300'}`}>
+            </div>
+            
+            <div className="relative z-10">
+              {conversation.status === 'connected' ? <MicOff size={36} /> : <Mic size={36} />}
+            </div>
           </button>
         </div>
         
