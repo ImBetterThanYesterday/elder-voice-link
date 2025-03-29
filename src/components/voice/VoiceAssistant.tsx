@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+
+import { useEffect, useState, useRef } from 'react';
 import { Mic, MicOff, MessageSquare } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface VoiceAssistantProps {
   agentId: string;
@@ -10,7 +12,8 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
   const [subtitleText, setSubtitleText] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-
+  const widgetRef = useRef<HTMLElement | null>(null);
+  
   useEffect(() => {
     // Setup event listeners for the ElevenLabs widget
     const setupEventListeners = () => {
@@ -18,6 +21,7 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
       const widgetInterval = setInterval(() => {
         const widgetElement = document.querySelector('elevenlabs-convai');
         if (widgetElement) {
+          widgetRef.current = widgetElement as HTMLElement;
           clearInterval(widgetInterval);
           
           // Listen to widget events
@@ -48,6 +52,41 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
     setupEventListeners();
   }, []);
 
+  const handleMicrophoneClick = () => {
+    if (!widgetRef.current) {
+      toast.error("Voice assistant not ready. Please try again.");
+      return;
+    }
+    
+    try {
+      if (isListening) {
+        // If already listening, stop listening
+        widgetRef.current.dispatchEvent(new CustomEvent('stopListening'));
+        setIsListening(false);
+      } else {
+        // Request microphone access first
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(() => {
+            // Start listening
+            widgetRef.current?.dispatchEvent(new CustomEvent('startListening'));
+            setIsListening(true);
+          })
+          .catch((err) => {
+            console.error("Microphone access denied:", err);
+            toast.error("Please allow microphone access to use the voice assistant");
+          });
+      }
+    } catch (error) {
+      console.error("Error toggling microphone:", error);
+      toast.error("Something went wrong with the microphone");
+    }
+  };
+
+  const handleMessageClick = () => {
+    // Show conversation history or open a chat panel
+    toast.info("Message history feature coming soon!");
+  };
+
   return (
     <div className={`voice-assistant-container flex flex-col items-center ${className || ''}`}>
       {/* Hide the actual ElevenLabs widget but keep it functional */}
@@ -63,7 +102,10 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-blue-400 to-teal-300 rounded-full blur-sm"></div>
           <div className="absolute inset-1 bg-gradient-to-tr from-fuchsia-400 via-blue-500 to-teal-400 rounded-full"></div>
           
-          <div className={`absolute inset-0 flex items-center justify-center rounded-full ${isListening ? 'animate-pulse' : ''}`}>
+          <div 
+            className={`absolute inset-0 flex items-center justify-center rounded-full ${isListening ? 'animate-pulse' : ''} cursor-pointer`}
+            onClick={handleMicrophoneClick}
+          >
             <div className="w-[95%] h-[95%] bg-black rounded-full flex items-center justify-center">
               <div className={`w-full h-full bg-gradient-to-bl from-violet-500 via-indigo-400 to-teal-300 rounded-full opacity-90 flex items-center justify-center transition-all duration-700 ${isListening ? 'animate-pulse scale-[0.97]' : 'scale-[0.92]'}`}>
               </div>
@@ -84,6 +126,7 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
           <button 
             className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${isListening ? 'bg-lime-400 text-black' : 'bg-lime-400/90 text-black'}`}
             aria-label={isListening ? "Stop listening" : "Start listening"}
+            onClick={handleMicrophoneClick}
           >
             {isListening ? <MicOff size={24} /> : <Mic size={24} />}
           </button>
@@ -91,6 +134,7 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
           <button 
             className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-800/70 text-white"
             aria-label="Show messages"
+            onClick={handleMessageClick}
           >
             <MessageSquare size={20} />
           </button>
@@ -98,7 +142,7 @@ const VoiceAssistant = ({ agentId, className }: VoiceAssistantProps) => {
         
         {/* Large subtitle display for the elderly */}
         <div className={`subtitles-container mt-6 p-4 bg-black/80 text-white rounded-lg w-full max-w-md transition-all duration-300 ${(isSpeaking || isListening) ? 'opacity-100' : 'opacity-0'}`}>
-          <p className="text-elder-xl text-center font-medium">
+          <p className="text-2xl text-center font-medium">
             {subtitleText}
           </p>
         </div>
