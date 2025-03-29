@@ -1,3 +1,4 @@
+
 import { useCallback, useState } from 'react';
 import { Mic, MicOff, MessageSquare } from 'lucide-react';
 import { useConversation } from '@11labs/react';
@@ -12,6 +13,7 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
   const [subtitleText, setSubtitleText] = useState('Presiona el círculo o el micrófono para hablar');
   const [userMessage, setUserMessage] = useState('');
 
+  // Use the conversation hook from @11labs/react
   const conversation = useConversation({
     onConnect: () => {
       console.log('Conectado a ElevenLabs');
@@ -24,22 +26,26 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
     onMessage: (message) => {
       console.log('Mensaje recibido:', message);
       
-      if (message.type === 'agentResponse') {
+      // Handle different message types based on the ElevenLabs API structure
+      if ('type' in message && message.type === 'agentResponse') {
         setSubtitleText(message.text || '');
-      } else if (message.type === 'transcription') {
+      } else if ('type' in message && message.type === 'transcription') {
         setUserMessage(message.text || '');
         setSubtitleText('Escuchando...');
-      } else if (message.type === 'agentResponseFinished') {
+      } else if ('type' in message && message.type === 'agentResponseFinished') {
         setTimeout(() => {
           if (subtitleText === message.text) {
             setSubtitleText('¿En qué más puedo ayudarle?');
           }
         }, 1000);
+      } else if ('message' in message) {
+        // Handle standard message format
+        setSubtitleText(message.message);
       }
     },
     onError: (error) => {
       console.error('Error en conversación:', error);
-      setSubtitleText('Error: ' + (error.message || 'Ocurrió un error'));
+      setSubtitleText('Error: ' + (error instanceof Error ? error.message : 'Ocurrió un error'));
     }
   });
 
