@@ -1,0 +1,22 @@
+
+{
+  "name": "Elder Voice Link",
+  "short_name": "Voice Link",
+  "description": "Voice assistant platform for older adults",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#33c3f0",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
