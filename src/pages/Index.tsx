@@ -21,13 +21,13 @@ const Index = () => {
 
         <section className="w-full max-w-lg px-4">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="py-3 px-4 bg-[#33C3F0] text-white flex items-center">
+            <div className="py-3 px-4 bg-[#00c2ff] text-white flex items-center">
               <span className="text-sm font-medium">Interactive Demo</span>
             </div>
             <VoiceAssistant 
               agentId={agentId} 
               apiKey={apiKey} 
-              className="p-4" 
+              className="p-6" 
             />
           </div>
           
