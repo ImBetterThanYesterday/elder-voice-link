@@ -16,7 +16,7 @@ interface VoiceAssistantProps {
 }
 
 const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => {
-  const [subtitleText, setSubtitleText] = useState('Press the microphone to talk');
+  const [subtitleText, setSubtitleText] = useState('Tap the mic to start talking with me');
   const [userMessage, setUserMessage] = useState('');
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [streamingText, setStreamingText] = useState('');
@@ -25,11 +25,11 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
   const conversation = useConversation({
     onConnect: () => {
       console.log('Connected to ElevenLabs');
-      setSubtitleText('Connected. Waiting for your query...');
+      setSubtitleText('I\'m listening! What\'s on your mind?');
     },
     onDisconnect: () => {
       console.log('Disconnected from ElevenLabs');
-      setSubtitleText('Conversation ended');
+      setSubtitleText('Chat ended. Tap the mic when you\'re ready to talk again');
       setStreamingText('');
     },
     onMessage: (message) => {
@@ -58,7 +58,7 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
               }]);
             }
             
-            setSubtitleText('Listening...');
+            setSubtitleText('I\'m listening...');
           } 
           else if (typedMessage.type === 'agentResponseFinished') {
             // Add assistant response to chat history
@@ -72,7 +72,7 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
             setStreamingText('');
             
             setTimeout(() => {
-              setSubtitleText('What else can I help you with?');
+              setSubtitleText('What else would you like to talk about?');
             }, 1000);
           }
         } 
@@ -85,7 +85,8 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
     },
     onError: (error) => {
       console.error('Error in conversation:', error);
-      setSubtitleText('Error: ' + (error && typeof error === 'object' && 'message' in error ? String(error.message) : 'An error occurred'));
+      setSubtitleText('Oops! Something went wrong. Please try again.' + 
+        (error && typeof error === 'object' && 'message' in error ? ' ' + String(error.message) : ''));
     }
   });
 
@@ -100,13 +101,13 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
       console.log("Conversation started with agentId:", agentId);
     } catch (error) {
       console.error('Could not start the conversation:', error);
-      setSubtitleText('Error: Could not access the microphone');
+      setSubtitleText('I need microphone access to hear you. Please allow mic access and try again.');
     }
   }, [conversation, agentId]);
 
   const stopConversation = useCallback(async () => {
     await conversation.endSession();
-    setSubtitleText('Conversation ended');
+    setSubtitleText('Chat paused. Tap the mic when you\'re ready to continue');
   }, [conversation]);
 
   return (
@@ -131,16 +132,16 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
         </div>
         
         {/* Text display area - shown minimally */}
-        {subtitleText && subtitleText !== 'Press the microphone to talk' && (
-          <div className="text-center text-sm text-gray-400 animate-pulse">
+        {subtitleText && subtitleText !== 'Tap the mic to start talking with me' && (
+          <div className="text-center text-sm text-blue-300 animate-pulse">
             {subtitleText}
           </div>
         )}
 
         {/* Minimal chat history only when there are messages - shown as floating info */}
         {chatHistory.length > 0 && streamingText && (
-          <div className="text-center text-gray-400 text-sm">
-            <span className="animate-pulse">Grand AI is listening...</span>
+          <div className="text-center text-blue-300 text-sm">
+            <span className="animate-pulse">Grand AI is thinking...</span>
           </div>
         )}
       </div>
