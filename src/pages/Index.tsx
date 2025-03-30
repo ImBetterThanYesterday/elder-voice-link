@@ -9,22 +9,33 @@ const Index = () => {
 
   return (
     <MainLayout>
-      <div className="flex flex-col items-center min-h-[80vh] justify-center bg-black text-white">
+      <div className="flex flex-col items-center min-h-[80vh] justify-center bg-gray-50 py-8">
         <section className="text-center mb-8">
-          <h1 className="text-elder-xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-lime-400 to-teal-300">
+          <h1 className="text-elder-2xl font-bold mb-2 text-gray-800">
             Grand AI
           </h1>
-          <p className="text-elder-base max-w-xs mx-auto text-gray-300">
+          <p className="text-elder-base max-w-xs mx-auto text-gray-600">
             Your assistant and Your friend
           </p>
         </section>
 
-        <section className="w-full max-w-md px-4">
-          <VoiceAssistant 
-            agentId={agentId} 
-            apiKey={apiKey} 
-            className="mb-8" 
-          />
+        <section className="w-full max-w-lg px-4">
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="py-3 px-4 bg-[#33C3F0] text-white flex items-center">
+              <span className="text-sm font-medium">Interactive Demo</span>
+            </div>
+            <VoiceAssistant 
+              agentId={agentId} 
+              apiKey={apiKey} 
+              className="p-4" 
+            />
+          </div>
+          
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-500">
+              Experience our voice assistant technology firsthand. Ask questions, learn how it works, or explore features.
+            </p>
+          </div>
         </section>
       </div>
     </MainLayout>
