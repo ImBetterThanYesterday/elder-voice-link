@@ -9,34 +9,28 @@ const Index = () => {
 
   return (
     <MainLayout>
-      <div className="flex flex-col items-center min-h-[80vh] justify-center bg-gray-50 py-8">
-        <section className="text-center mb-8">
-          <h1 className="text-elder-2xl font-bold mb-2 text-gray-800">
-            Grand AI
-          </h1>
-          <p className="text-elder-base max-w-xs mx-auto text-gray-600">
-            Your assistant and Your friend
-          </p>
-        </section>
+      <div className="flex flex-col items-center justify-between min-h-screen bg-gradient-to-b from-black to-gray-900 text-white py-8 px-4">
+        <div className="flex-1"></div>
+        
+        <div className="flex flex-col items-center justify-center w-full max-w-md space-y-4">
+          <div className="text-center mb-4">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold mb-2 text-gradient-blue">
+              What Can I Do for<br />You Today?
+            </h1>
+          </div>
 
-        <section className="w-full max-w-lg px-4">
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="py-3 px-4 bg-[#00c2ff] text-white flex items-center">
-              <span className="text-sm font-medium">Interactive Demo</span>
-            </div>
-            <VoiceAssistant 
-              agentId={agentId} 
-              apiKey={apiKey} 
-              className="p-6" 
-            />
-          </div>
-          
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-500">
-              Experience our voice assistant technology firsthand. Ask questions, learn how it works, or explore features.
-            </p>
-          </div>
-        </section>
+          <VoiceAssistant
+            agentId={agentId}
+            apiKey={apiKey}
+            className="w-full"
+          />
+        </div>
+        
+        <div className="flex-1 flex items-end justify-center mt-8">
+          <p className="text-xs text-gray-400 opacity-70">
+            Grand AI - Your assistant and friend
+          </p>
+        </div>
       </div>
     </MainLayout>
   );

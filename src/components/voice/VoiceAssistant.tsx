@@ -85,7 +85,7 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
     },
     onError: (error) => {
       console.error('Error in conversation:', error);
-      setSubtitleText('Error: ' + (error && typeof error === 'object' && 'message' in error ? error.message : 'An error occurred'));
+      setSubtitleText('Error: ' + (error && typeof error === 'object' && 'message' in error ? String(error.message) : 'An error occurred'));
     }
   });
 
@@ -111,66 +111,36 @@ const VoiceAssistant = ({ agentId, apiKey, className }: VoiceAssistantProps) => 
 
   return (
     <div className={`voice-assistant-container flex flex-col items-center ${className || ''}`}>
-      <div className="w-full max-w-xl mx-auto flex flex-col items-center space-y-6 bg-white rounded-xl p-6">
-        {/* Larger microphone button with bright blue color */}
-        <div className="flex flex-col items-center justify-center relative mb-4">
+      <div className="w-full flex flex-col items-center justify-center space-y-10">
+        {/* Energy ring effect with microphone button */}
+        <div className="energy-ring">
           <button 
-            className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 
-              bg-[#00c2ff] text-white shadow-lg hover:scale-105`}
+            className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 
+              ${conversation.status === 'connected' ? 'bg-[#00c2ff]/20 border-[#00c2ff]/30' : 'bg-black/30 border-[#00c2ff]/10'} 
+              border-2 glow-button ${conversation.status === 'connected' ? 'active' : ''}`}
             onClick={conversation.status === 'connected' ? stopConversation : startConversation}
             aria-label={conversation.status === 'connected' ? "Stop conversation" : "Start conversation"}
           >
-            {/* Glow effect */}
-            <div className="absolute inset-0 rounded-full blur-md opacity-30 bg-[#00c2ff]"></div>
-            
             <div className="relative z-10">
-              {conversation.status === 'connected' ? <MicOff size={36} /> : <Mic size={36} />}
+              {conversation.status === 'connected' ? 
+                <MicOff size={32} className="text-[#00c2ff]" /> : 
+                <Mic size={32} className="text-[#00c2ff]" />
+              }
             </div>
           </button>
         </div>
         
-        {/* Current message/subtitle display with cleaner styling */}
-        <div className="w-full text-center">
-          <p className="text-lg font-medium text-gray-700">
-            {subtitleText || 'Press the microphone to talk'}
-          </p>
-        </div>
+        {/* Text display area - shown minimally */}
+        {subtitleText && subtitleText !== 'Press the microphone to talk' && (
+          <div className="text-center text-sm text-gray-400 animate-pulse">
+            {subtitleText}
+          </div>
+        )}
 
-        {/* Status indicators in a cleaner layout */}
-        <div className="flex items-center justify-center space-x-6 text-sm mt-6">
-          <div className="flex items-center">
-            <span className={`w-2 h-2 rounded-full mr-2 ${conversation.status === 'connected' ? 'bg-green-500' : 'bg-gray-400'}`}></span>
-            <span className="text-gray-600">Voice {conversation.status === 'connected' ? 'enabled' : 'disabled'}</span>
-          </div>
-          <div className="flex items-center">
-            <span className="text-gray-600">AI powered</span>
-          </div>
-        </div>
-        
-        {/* Only show chat history when there are messages */}
-        {chatHistory.length > 0 && (
-          <div className="w-full bg-gray-50 rounded-lg p-4 mt-4 max-h-[250px] overflow-y-auto border border-gray-200">
-            <div className="flex flex-col space-y-4">
-              {chatHistory.map((msg, index) => (
-                <div 
-                  key={index} 
-                  className={`px-3 py-2 rounded-lg ${msg.isUser ? 'bg-[#e0f7ff] ml-auto' : 'bg-[#f0f9ff]'} max-w-[80%] border border-gray-200`}
-                >
-                  <p className="text-gray-700">{msg.text}</p>
-                  <span className="text-xs text-gray-400">
-                    {msg.isUser ? 'You' : 'Grand AI'} · {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-              ))}
-            </div>
-            
-            {/* Streaming text display */}
-            {streamingText && (
-              <div className="px-3 py-2 rounded-lg bg-[#f0f9ff] text-gray-700 mt-4 border border-gray-200">
-                <p>{streamingText}</p>
-                <span className="text-xs text-gray-400">Grand AI · typing...</span>
-              </div>
-            )}
+        {/* Minimal chat history only when there are messages - shown as floating info */}
+        {chatHistory.length > 0 && streamingText && (
+          <div className="text-center text-gray-400 text-sm">
+            <span className="animate-pulse">Grand AI is listening...</span>
           </div>
         )}
       </div>
