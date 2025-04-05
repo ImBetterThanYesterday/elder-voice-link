@@ -142,7 +142,8 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
   // Function to convert speech to text using ElevenLabs API
   const convertSpeechToText = async (audioBlob: Blob): Promise<string> => {
     const formData = new FormData();
-    formData.append('audio', audioBlob);
+    // Fix: Change from 'audio' to 'file' as expected by the API
+    formData.append('file', audioBlob, 'recording.webm');
     formData.append('model_id', 'whisper-1');
     
     try {
@@ -156,7 +157,7 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
-        throw new Error(`Speech to text failed: ${errorData.detail || response.statusText}`);
+        throw new Error(`Speech to text failed: ${JSON.stringify(errorData.detail || response.statusText)}`);
       }
       
       const data = await response.json();
