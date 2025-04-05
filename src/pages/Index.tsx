@@ -3,9 +3,8 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import VoiceAssistant from "@/components/voice/VoiceAssistant";
 
 const Index = () => {
-  // ElevenLabs API Key and Agent ID
-  const apiKey = "sk_aa411f2193444210a029eaa80ed22864d3928c3d22bd324a";
-  const agentId = "vOT8ib1IlJTnHikNtiN7";
+  // ElevenLabs API Key
+  const apiKey = "sk_a7d09d4d71312f96a63707e43614f4c8761f623db83654f9";
 
   return (
     <MainLayout>
@@ -23,7 +22,6 @@ const Index = () => {
           </div>
 
           <VoiceAssistant
-            agentId={agentId}
             apiKey={apiKey}
             className="w-full"
           />
