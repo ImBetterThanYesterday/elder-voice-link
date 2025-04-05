@@ -1,4 +1,3 @@
-
 import { useCallback, useState, useRef } from 'react';
 import { Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -25,7 +24,6 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
-  // Initialize audio element for playback
   if (typeof window !== 'undefined' && !audioRef.current) {
     audioRef.current = new Audio();
   }
@@ -53,14 +51,12 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
             setIsProcessing(true);
             setSubtitleText('Processing your message...');
             
-            // Convert audio to text using ElevenLabs speech-to-text API
             const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
             const transcribedText = await convertSpeechToText(audioBlob);
             
             if (transcribedText) {
               setUserMessage(transcribedText);
               
-              // Add user message to chat history
               setChatHistory(prev => [...prev, {
                 text: transcribedText,
                 isUser: true,
@@ -69,11 +65,9 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
               
               setSubtitleText('Processing with Grand AI...');
               
-              // Send to N8N endpoint and get response
               const aiResponse = await sendToN8N(transcribedText);
               
               if (aiResponse) {
-                // Add AI response to chat history
                 setChatHistory(prev => [...prev, {
                   text: aiResponse,
                   isUser: false,
@@ -82,7 +76,6 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
                 
                 setSubtitleText('Grand AI is speaking...');
                 
-                // Convert text to speech and play it
                 await convertTextToSpeech(aiResponse);
                 
                 setTimeout(() => {
@@ -130,7 +123,6 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       
-      // Close the media stream
       if (mediaRecorderRef.current.stream) {
         mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
       }
@@ -139,12 +131,10 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
     }
   }, [isRecording]);
   
-  // Function to convert speech to text using ElevenLabs API
   const convertSpeechToText = async (audioBlob: Blob): Promise<string> => {
     const formData = new FormData();
-    // Fix: Change from 'audio' to 'file' as expected by the API
     formData.append('file', audioBlob, 'recording.webm');
-    formData.append('model_id', 'whisper-1');
+    formData.append('model_id', 'scribe_v1');
     
     try {
       const response = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
@@ -168,7 +158,6 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
     }
   };
   
-  // Function to send text to N8N endpoint
   const sendToN8N = async (text: string): Promise<string> => {
     try {
       const response = await fetch('https://n8n-pc98.onrender.com/webhook/76c09305-9123-4cfb-831e-4bceaa51a561', {
@@ -193,7 +182,6 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
     }
   };
   
-  // Function to convert text to speech using ElevenLabs API
   const convertTextToSpeech = async (text: string): Promise<void> => {
     try {
       const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
@@ -236,7 +224,6 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
   return (
     <div className={`voice-assistant-container flex flex-col items-center ${className || ''}`}>
       <div className="w-full flex flex-col items-center justify-center space-y-10">
-        {/* Energy ring effect with microphone button */}
         <div className="energy-ring">
           <button 
             className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 
@@ -255,14 +242,12 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
           </button>
         </div>
         
-        {/* Text display area - shown minimally */}
         {subtitleText && subtitleText !== 'Tap the mic to start talking with me' && (
           <div className="text-center text-sm text-blue-300 animate-pulse">
             {subtitleText}
           </div>
         )}
 
-        {/* Processing indicator */}
         {isProcessing && (
           <div className="text-center text-blue-300 text-sm">
             <span className="animate-pulse">Grand AI is thinking...</span>
