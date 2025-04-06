@@ -1,4 +1,5 @@
-import { useCallback, useState, useRef } from 'react';
+
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -19,6 +20,7 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -28,8 +30,58 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
     audioRef.current = new Audio();
   }
 
+  // Initial greeting effect
+  useEffect(() => {
+    if (!isInitialized && apiKey) {
+      setIsInitialized(true);
+      // This will ensure we don't repeat the greeting on re-renders
+    }
+  }, [apiKey, isInitialized]);
+
+  const speakMessage = async (text: string): Promise<void> => {
+    try {
+      const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'xi-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          text: text,
+          model_id: 'eleven_monolingual_v1',
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.5
+          }
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Text to speech failed: ${response.statusText}`);
+      }
+      
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+        };
+        return await audioRef.current.play();
+      }
+    } catch (error) {
+      console.error('Text to speech error:', error);
+      throw error;
+    }
+  };
+
   const startRecording = useCallback(async () => {
     try {
+      // First speak a welcome message
+      setSubtitleText('Welcome! I\'ll be with you in a moment...');
+      await speakMessage("Hello I'm Link! Today it's a beautiful day. How can I make your day better?");
+      
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
       setIsRecording(true);
@@ -39,13 +91,30 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
       
+      // Set up a speech detection system (simplified)
+      let silenceTimeout: NodeJS.Timeout;
+      const silenceDetectionThreshold = 5000; // 5 seconds of silence
+      
+      const resetSilenceDetection = () => {
+        clearTimeout(silenceTimeout);
+        silenceTimeout = setTimeout(() => {
+          if (mediaRecorderRef.current && isRecording) {
+            stopRecording();
+          }
+        }, silenceDetectionThreshold);
+      };
+      
+      // Simple audio activity detection through data availability
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
+          resetSilenceDetection();
         }
       };
       
       mediaRecorder.onstop = async () => {
+        clearTimeout(silenceTimeout);
+        
         if (audioChunksRef.current.length > 0) {
           try {
             setIsProcessing(true);
@@ -62,6 +131,10 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
                 isUser: true,
                 timestamp: new Date()
               }]);
+              
+              // Speak acknowledgment message
+              setSubtitleText('Perfect! Processing with Grand AI...');
+              await speakMessage("Perfect, I understand correctly. Let me take a few seconds to think about it.");
               
               setSubtitleText('Processing with Grand AI...');
               
@@ -106,7 +179,10 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
         }
       };
       
-      mediaRecorder.start();
+      // Start capturing audio with frequent data availability for silence detection
+      mediaRecorder.start(1000);
+      resetSilenceDetection();
+      
     } catch (error) {
       console.error('Could not start recording:', error);
       setSubtitleText('I need microphone access to hear you. Please allow mic access and try again.');
@@ -116,7 +192,7 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
         variant: "destructive",
       });
     }
-  }, [toast]);
+  }, [toast, isRecording]);
   
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording) {
