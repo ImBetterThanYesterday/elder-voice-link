@@ -4,6 +4,12 @@
  * Handles speech-to-text and text-to-speech functionality
  */
 
+// Helper function to remove or replace URLs in text for speaking
+const prepareTextForSpeech = (text: string): string => {
+  // Replace URLs with a more speakable phrase
+  return text.replace(/(https?:\/\/[^\s]+)/g, 'Link provided in the text');
+};
+
 export const convertSpeechToText = async (audioBlob: Blob, apiKey: string): Promise<string> => {
   const formData = new FormData();
   formData.append('file', audioBlob, 'recording.webm');
@@ -33,6 +39,9 @@ export const convertSpeechToText = async (audioBlob: Blob, apiKey: string): Prom
 
 export const convertTextToSpeech = async (text: string, apiKey: string): Promise<Blob> => {
   try {
+    // Prepare text for speech by handling URLs
+    const processedText = prepareTextForSpeech(text);
+    
     const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
       method: 'POST',
       headers: {
@@ -40,7 +49,7 @@ export const convertTextToSpeech = async (text: string, apiKey: string): Promise
         'xi-api-key': apiKey,
       },
       body: JSON.stringify({
-        text: text,
+        text: processedText,
         model_id: 'eleven_monolingual_v1',
         voice_settings: {
           stability: 0.5,

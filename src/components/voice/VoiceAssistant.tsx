@@ -1,5 +1,5 @@
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { convertSpeechToText, convertTextToSpeech } from '@/services/elevenlabs';
 import { sendToN8N } from '@/services/n8n';
@@ -20,6 +20,8 @@ interface VoiceAssistantProps {
 
 const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
   const [subtitleText, setSubtitleText] = useState('Tap the mic to start talking with me');
+  const [activeSpeech, setActiveSpeech] = useState('');
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [userMessage, setUserMessage] = useState('');
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -30,11 +32,64 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
     audioRef.current = new Audio();
   }
 
+  // Play greeting message when component mounts
+  useEffect(() => {
+    const playGreeting = async () => {
+      const greetingMessage = "Hello! I'm your AI assistant. How can I help you today?";
+      try {
+        const audioBlob = await convertTextToSpeech(greetingMessage, apiKey);
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        if (audioRef.current) {
+          audioRef.current.src = audioUrl;
+          audioRef.current.onended = () => {
+            URL.revokeObjectURL(audioUrl);
+            setActiveSpeech('');
+            setIsSpeaking(false);
+          };
+          setActiveSpeech(greetingMessage);
+          setIsSpeaking(true);
+          await audioRef.current.play();
+        }
+      } catch (error) {
+        console.error('Error playing greeting:', error);
+      }
+    };
+
+    setTimeout(() => {
+      playGreeting();
+    }, 1000);
+  }, [apiKey]);
+
+  // Function to synchronize text with speech
+  const speakText = async (text: string) => {
+    try {
+      setIsSpeaking(true);
+      setActiveSpeech(text);
+      
+      const audioBlob = await convertTextToSpeech(text, apiKey);
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+          setIsSpeaking(false);
+        };
+        await audioRef.current.play();
+      }
+    } catch (error) {
+      console.error('Error speaking text:', error);
+      setIsSpeaking(false);
+    }
+  };
+
   const handleAudioProcessing = useCallback(async (audioBlob: Blob) => {
     try {
       setIsProcessing(true);
       setSubtitleText('Processing your message...');
       
+      // Speech to text
       const transcribedText = await convertSpeechToText(audioBlob, apiKey);
       
       if (transcribedText) {
@@ -46,8 +101,12 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
           timestamp: new Date()
         }]);
         
+        // Acknowledge user's message
+        await speakText("I understand. Give me a moment to process your request.");
+        
         setSubtitleText('Processing with Grand AI...');
         
+        // Get AI response
         const aiResponse = await sendToN8N(transcribedText);
         
         if (aiResponse) {
@@ -59,17 +118,10 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
           
           setSubtitleText('Grand AI is speaking...');
           
-          const audioBlob = await convertTextToSpeech(aiResponse, apiKey);
-          const audioUrl = URL.createObjectURL(audioBlob);
+          // Speak the response, displaying subtitles
+          await speakText(aiResponse);
           
-          if (audioRef.current) {
-            audioRef.current.src = audioUrl;
-            audioRef.current.onended = () => {
-              URL.revokeObjectURL(audioUrl);
-              setSubtitleText('What else would you like to talk about?');
-            };
-            await audioRef.current.play();
-          }
+          setSubtitleText('What else would you like to talk about?');
         }
       }
     } catch (error) {
@@ -119,7 +171,9 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
         
         <StatusIndicator 
           subtitleText={subtitleText} 
-          isProcessing={isProcessing} 
+          isProcessing={isProcessing}
+          activeSpeech={activeSpeech}
+          isSpeaking={isSpeaking}
         />
       </div>
     </div>

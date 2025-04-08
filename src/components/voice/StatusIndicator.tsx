@@ -1,12 +1,22 @@
 
+import React from 'react';
+import SubtitleDisplay from './SubtitleDisplay';
+
 interface StatusIndicatorProps {
   subtitleText: string;
   isProcessing: boolean;
+  activeSpeech: string;
+  isSpeaking: boolean;
 }
 
-const StatusIndicator = ({ subtitleText, isProcessing }: StatusIndicatorProps) => {
+const StatusIndicator = ({ 
+  subtitleText, 
+  isProcessing, 
+  activeSpeech, 
+  isSpeaking 
+}: StatusIndicatorProps) => {
   return (
-    <>
+    <div className="flex flex-col items-center space-y-4 w-full">
       {subtitleText && subtitleText !== 'Tap the mic to start talking with me' && (
         <div className="text-center text-sm text-blue-300 animate-pulse">
           {subtitleText}
@@ -18,7 +28,11 @@ const StatusIndicator = ({ subtitleText, isProcessing }: StatusIndicatorProps) =
           <span className="animate-pulse">Grand AI is thinking...</span>
         </div>
       )}
-    </>
+
+      {activeSpeech && (
+        <SubtitleDisplay text={activeSpeech} isActive={isSpeaking} />
+      )}
+    </div>
   );
 };
 
