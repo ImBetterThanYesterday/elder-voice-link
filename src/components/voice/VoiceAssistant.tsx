@@ -19,7 +19,7 @@ interface VoiceAssistantProps {
 }
 
 const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
-  const [subtitleText, setSubtitleText] = useState('Tap the mic to start talking with me');
+  const [subtitleText, setSubtitleText] = useState('Toca el micrófono para comenzar a hablar conmigo');
   const [activeSpeech, setActiveSpeech] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [userMessage, setUserMessage] = useState('');
@@ -35,7 +35,7 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
   // Play greeting message when component mounts
   useEffect(() => {
     const playGreeting = async () => {
-      const greetingMessage = "Hello! I'm your AI assistant. How can I help you today?";
+      const greetingMessage = "¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?";
       try {
         const audioBlob = await convertTextToSpeech(greetingMessage, apiKey);
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -52,7 +52,7 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
           await audioRef.current.play();
         }
       } catch (error) {
-        console.error('Error playing greeting:', error);
+        console.error('Error reproduciendo saludo:', error);
       }
     };
 
@@ -79,7 +79,7 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
         await audioRef.current.play();
       }
     } catch (error) {
-      console.error('Error speaking text:', error);
+      console.error('Error hablando texto:', error);
       setIsSpeaking(false);
     }
   };
@@ -87,7 +87,7 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
   const handleAudioProcessing = useCallback(async (audioBlob: Blob) => {
     try {
       setIsProcessing(true);
-      setSubtitleText('Processing your message...');
+      setSubtitleText('Procesando tu mensaje...');
       
       // Speech to text
       const transcribedText = await convertSpeechToText(audioBlob, apiKey);
@@ -102,9 +102,9 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
         }]);
         
         // Acknowledge user's message
-        await speakText("I understand. Give me a moment to process your request.");
+        await speakText("Entiendo. Dame un momento para procesar tu solicitud.");
         
-        setSubtitleText('Processing with Grand AI...');
+        setSubtitleText('Procesando con Grand AI...');
         
         // Get AI response
         const aiResponse = await sendToN8N(transcribedText);
@@ -116,28 +116,28 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
             timestamp: new Date()
           }]);
           
-          setSubtitleText('Grand AI is speaking...');
+          setSubtitleText('Grand AI está hablando...');
           
           // Speak the response, displaying subtitles
           await speakText(aiResponse);
           
-          setSubtitleText('What else would you like to talk about?');
+          setSubtitleText('¿De qué más te gustaría hablar?');
         }
       }
     } catch (error) {
-      console.error('Error processing audio:', error);
+      console.error('Error procesando audio:', error);
       if (error instanceof Error) {
-        setSubtitleText('Oops! Something went wrong. Please try again. ' + error.message);
+        setSubtitleText('¡Ups! Algo salió mal. Por favor, inténtalo de nuevo. ' + error.message);
         toast({
           title: "Error",
-          description: `Processing failed: ${error.message}`,
+          description: `El procesamiento falló: ${error.message}`,
           variant: "destructive",
         });
       } else {
-        setSubtitleText('Oops! Something went wrong. Please try again.');
+        setSubtitleText('¡Ups! Algo salió mal. Por favor, inténtalo de nuevo.');
         toast({
           title: "Error",
-          description: "An unknown error occurred",
+          description: "Ocurrió un error desconocido",
           variant: "destructive",
         });
       }
@@ -153,10 +153,10 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
   const handleMicButtonClick = () => {
     if (isRecording) {
       stopRecording();
-      setSubtitleText('Processing your audio...');
+      setSubtitleText('Procesando tu audio...');
     } else {
       startRecording();
-      setSubtitleText('I\'m listening! What\'s on your mind?');
+      setSubtitleText('Estoy escuchando. ¿Qué tienes en mente?');
     }
   };
 

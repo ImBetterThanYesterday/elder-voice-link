@@ -7,7 +7,7 @@
 // Helper function to remove or replace URLs in text for speaking
 const prepareTextForSpeech = (text: string): string => {
   // Replace URLs with a more speakable phrase
-  return text.replace(/(https?:\/\/[^\s]+)/g, 'Link provided in the text');
+  return text.replace(/(https?:\/\/[^\s]+)/g, 'Enlace proporcionado en el texto');
 };
 
 export const convertSpeechToText = async (audioBlob: Blob, apiKey: string): Promise<string> => {
@@ -25,14 +25,14 @@ export const convertSpeechToText = async (audioBlob: Blob, apiKey: string): Prom
     });
     
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
-      throw new Error(`Speech to text failed: ${JSON.stringify(errorData.detail || response.statusText)}`);
+      const errorData = await response.json().catch(() => ({ detail: 'Error desconocido' }));
+      throw new Error(`La conversión de voz a texto falló: ${JSON.stringify(errorData.detail || response.statusText)}`);
     }
     
     const data = await response.json();
     return data.text || '';
   } catch (error) {
-    console.error('Speech to text error:', error);
+    console.error('Error de voz a texto:', error);
     throw error;
   }
 };
@@ -42,7 +42,7 @@ export const convertTextToSpeech = async (text: string, apiKey: string): Promise
     // Prepare text for speech by handling URLs
     const processedText = prepareTextForSpeech(text);
     
-    const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
+    const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/4ClPfGRNxnfy7Zzp4OId', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export const convertTextToSpeech = async (text: string, apiKey: string): Promise
       },
       body: JSON.stringify({
         text: processedText,
-        model_id: 'eleven_monolingual_v1',
+        model_id: 'eleven_multilingual_v2',
         voice_settings: {
           stability: 0.5,
           similarity_boost: 0.5
@@ -59,12 +59,12 @@ export const convertTextToSpeech = async (text: string, apiKey: string): Promise
     });
     
     if (!response.ok) {
-      throw new Error(`Text to speech failed: ${response.statusText}`);
+      throw new Error(`La conversión de texto a voz falló: ${response.statusText}`);
     }
     
     return await response.blob();
   } catch (error) {
-    console.error('Text to speech error:', error);
+    console.error('Error de texto a voz:', error);
     throw error;
   }
 };
