@@ -106,10 +106,10 @@ const Index = () => {
         <div className="flex flex-col items-center justify-center w-full max-w-md space-y-4">
           <div className="text-center mb-4">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold mb-2 text-gradient-blue">
-              Hey there! How can I<br />help you today?
+              ¡Hola! ¿Cómo puedo<br />ayudarte hoy?
             </h1>
             <p className="text-lg text-blue-300 mt-3">
-              I'm your friendly AI assistant, ready to chat
+              Soy tu asistente de IA, listo para conversar
             </p>
           </div>
 
@@ -121,7 +121,7 @@ const Index = () => {
         
         <div className="flex-1 flex items-end justify-center mt-8">
           <p className="text-xs text-gray-400 opacity-70">
-            Grand AI - Your personal assistant, always here for you
+            Grand AI - Tu asistente personal, siempre aquí para ti
           </p>
         </div>
       </div>
