@@ -48,14 +48,14 @@ const Index = () => {
         }
 
         // Actualizar el token a inactivo
-        const { error: updateError } = await supabase
-          .from('token_logs')
-          .update({ is_active: false })
-          .eq('generated_token', token);
+        // const { error: updateError } = await supabase
+        //   .from('token_logs')
+        //   .update({ is_active: false })
+        //   .eq('generated_token', token);
 
-        if (updateError) {
-          throw new Error('Error al actualizar el estado del token');
-        }
+        // if (updateError) {
+        //   throw new Error('Error al actualizar el estado del token');
+        // }
 
         toast({
           title: "Acceso validado",
