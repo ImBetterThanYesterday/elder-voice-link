@@ -3,6 +3,7 @@ import VoiceAssistant from "@/components/voice/VoiceAssistant";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [searchParams] = useSearchParams();
@@ -25,48 +26,55 @@ const Index = () => {
       }
 
       try {
-        // Simular validación del token
-        const isTokenValid = await new Promise<boolean>((resolve) => {
-          setTimeout(() => resolve(true), 1000);
-        });
+        // Consultar el token en la base de datos
+        const { data: tokenData, error: tokenError } = await supabase
+          .from('token_logs')
+          .select('*')
+          .eq('generated_token', token)
+          .eq('elder_id', userId)
+          .eq('is_active', true)
+          .single();
+
+        console.log(tokenData, tokenError);
+
+        if (tokenError) {
+          throw new Error('Error al validar el token');
+        }
+
+        if (!tokenData) {
+          setError('Token inválido o expirado');
+          setIsLoading(false);
+          return;
+        }
+
+        // Actualizar el token a inactivo
+        const { error: updateError } = await supabase
+          .from('token_logs')
+          .update({ is_active: false })
+          .eq('generated_token', token);
+
+        if (updateError) {
+          throw new Error('Error al actualizar el estado del token');
+        }
 
         toast({
-          title: "Token validado",
+          title: "Acceso validado",
           description: "Token validado correctamente",
           variant: "default",
-        })
-
-        // Simular validación del userId
-        const isUserIdValid = await new Promise<boolean>((resolve) => {
-          setTimeout(() => resolve(true), 1000);
-        });
-        
-        toast({
-          title: "Usuario validado",
-          description: "Usuario validado correctamente",
-          variant: "default",
-        })
-        
-        
-        await new Promise<boolean>((resolve) => {
-          setTimeout(() => resolve(true), 1000);
         });
 
-        if (isTokenValid && isUserIdValid) {
-          setIsValid(true);
-          console.log('Inicio de sesión correcto');
-        } else {
-          setError('Credenciales inválidas');
-        }
+        setIsValid(true);
+        console.log('Inicio de sesión correcto');
       } catch (err) {
         setError('Error en la validación');
+        console.error('Error:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
     validateParams();
-  }, [searchParams]);
+  }, [searchParams, toast]);
 
   if (isLoading) {
     return (
