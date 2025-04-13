@@ -5,11 +5,14 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
+const DEFAULT_ELDER_ID = "47c53ec8-de0c-4c8d-b97f-18608e7c4abe";
+
 const Index = () => {
   const [searchParams] = useSearchParams();
   const [isValid, setIsValid] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [elderId, setElderId] = useState(DEFAULT_ELDER_ID);
   const { toast } = useToast();
   // ElevenLabs API Key
   const apiKey = "sk_a7d09d4d71312f96a63707e43614f4c8761f623db83654f9";
@@ -121,9 +124,24 @@ const Index = () => {
             </p>
           </div>
 
+          <div className="w-full mb-4">
+            <label htmlFor="elderId" className="block text-sm font-medium text-gray-300 mb-2">
+              ID del Adulto Mayor
+            </label>
+            <input
+              type="text"
+              id="elderId"
+              value={elderId}
+              onChange={(e) => setElderId(e.target.value)}
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ingrese el ID del adulto mayor"
+            />
+          </div>
+
           <VoiceAssistant
             apiKey={apiKey}
             className="w-full"
+            elderId={elderId}
           />
         </div>
         

@@ -1,4 +1,3 @@
-
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { convertSpeechToText, convertTextToSpeech } from '@/services/elevenlabs';
@@ -16,9 +15,10 @@ interface Message {
 interface VoiceAssistantProps {
   apiKey: string;
   className?: string;
+  elderId: string;
 }
 
-const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
+const VoiceAssistant = ({ apiKey, className, elderId }: VoiceAssistantProps) => {
   const [subtitleText, setSubtitleText] = useState('Toca el micrófono para comenzar a hablar conmigo');
   const [activeSpeech, setActiveSpeech] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -107,7 +107,7 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
         setSubtitleText('Procesando con Grand AI...');
         
         // Get AI response
-        const aiResponse = await sendToN8N(transcribedText);
+        const aiResponse = await sendToN8N(transcribedText, elderId);
         
         if (aiResponse) {
           setChatHistory(prev => [...prev, {
@@ -144,7 +144,7 @@ const VoiceAssistant = ({ apiKey, className }: VoiceAssistantProps) => {
     } finally {
       setIsProcessing(false);
     }
-  }, [apiKey, toast]);
+  }, [apiKey, toast, elderId]);
 
   const { isRecording, startRecording, stopRecording } = useVoiceRecording({
     onRecordingComplete: handleAudioProcessing
