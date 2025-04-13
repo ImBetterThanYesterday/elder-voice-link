@@ -2,8 +2,10 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://khyqiesxsucelpkcnuqj.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtoeXFpZXN4c3VjZWxwa2NudXFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0OTg5ODQsImV4cCI6MjA2MDA3NDk4NH0.YIJK_olPdaOiuTOiGyjLlFISfPls-FtrciMvMItJtnU";
+// const SUPABASE_URL = "https://khyqiesxsucelpkcnuqj.supabase.co";
+// const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtoeXFpZXN4c3VjZWxwa2NudXFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ0OTg5ODQsImV4cCI6MjA2MDA3NDk4NH0.YIJK_olPdaOiuTOiGyjLlFISfPls-FtrciMvMItJtnU";
+const SUPABASE_URL = "https://elder-link-staging-supabase.fwoasm.easypanel.host"; 
+const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJzZXJ2aWNlX3JvbGUiLAogICAgImlzcyI6ICJzdXBhYmFzZS1kZW1vIiwKICAgICJpYXQiOiAxNjQxNzY5MjAwLAogICAgImV4cCI6IDE3OTk1MzU2MDAKfQ.DaYlNEoUrrEn2Ig7tqibS-PHK5vgusbcbo7X36XVt4Q";
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";

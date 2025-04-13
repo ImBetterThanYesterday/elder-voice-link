@@ -3,7 +3,7 @@
  * Handles communication with the N8N endpoint
  */
 
-export const sendToN8N = async (text: string, elderId: string = "47c53ec8-de0c-4c8d-b97f-18608e7c4abe"): Promise<string> => {
+export const sendToN8N = async (text: string, elderId: string = "4ea636a8-ff11-48fa-af8e-54f41268a7fa"): Promise<string> => {
   try {
     const response = await fetch(
       "https://n8n-pc98.onrender.com/webhook/76c09305-9123-4cfb-831e-4bceaa51a561",

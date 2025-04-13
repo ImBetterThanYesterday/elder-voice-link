@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
-const DEFAULT_ELDER_ID = "47c53ec8-de0c-4c8d-b97f-18608e7c4abe";
+const DEFAULT_ELDER_ID = "4ea636a8-ff11-48fa-af8e-54f41268a7fa";
 
 const Index = () => {
   const [searchParams] = useSearchParams();
