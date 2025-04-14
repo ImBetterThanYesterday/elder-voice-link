@@ -4,8 +4,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { currentEnvironment } from "@/utils/endpoints";
+import Cookies from 'js-cookie';
 
-const DEFAULT_ELDER_ID = "4ea636a8-ff11-48fa-af8e-54f41268a7fa";
+const DEFAULT_ELDER_ID = import.meta.env.VITE_ELDER_ID;
+const SESSION_COOKIE_NAME = 'user_session';
+const SESSION_EXPIRY_DAYS = 7;
 
 const Index = () => {
   const [searchParams] = useSearchParams();
@@ -14,65 +18,100 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null);
   const [elderId, setElderId] = useState(DEFAULT_ELDER_ID);
   const { toast } = useToast();
+
   // ElevenLabs API Key
-  const apiKey = "sk_a7d09d4d71312f96a63707e43614f4c8761f623db83654f9";
+  const apiKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
 
   useEffect(() => {
     const validateParams = async () => {
-      const token = searchParams.get('token');
-      const userId = searchParams.get('userId');
-
-      if (!token || !userId) {
-        setError('Token y userId son requeridos');
-        setIsLoading(false);
-        return;
+      // Check for existing session cookie first
+      const existingSession = Cookies.get(SESSION_COOKIE_NAME);
+      if (existingSession) {
+        try {
+          const sessionData = JSON.parse(existingSession);
+          setElderId(sessionData.userId);
+          setIsValid(true);
+          setIsLoading(false);
+          return;
+        } catch (err) {
+          console.error('Error parsing session cookie:', err);
+          Cookies.remove(SESSION_COOKIE_NAME);
+        }
       }
 
-      try {
-        // Consultar el token en la base de datos
-        const { data: tokenData, error: tokenError } = await supabase
-          .from('token_logs')
-          .select('*')
-          .eq('generated_token', token)
-          .eq('elder_id', userId)
-          .eq('is_active', true)
-          .single();
-
-        console.log(tokenData, tokenError);
-
-        if (tokenError) {
-          throw new Error('Error al validar el token');
-        }
-
-        if (!tokenData) {
-          setError('Token inválido o expirado');
+      // if(!(currentEnvironment === "prod")) {
+      if(currentEnvironment === "prod") {
+        const token = searchParams.get('token');
+        const userId = searchParams.get('userId');
+  
+        if (!token || !userId) {
+          setError('Token y userId son requeridos');
           setIsLoading(false);
           return;
         }
+  
+        try {
+          // Consultar el token en la base de datos
+          const { data: tokenData, error: tokenError } = await supabase
+            .from('token_logs')
+            .select('*')
+            .eq('generated_token', token)
+            .eq('elder_id', userId)
+            .eq('is_active', true)
+            .single();
+  
+          console.log(tokenData, tokenError);
+  
+          if (tokenError) {
+            throw new Error('Error al validar el token');
+          }
+  
+          if (!tokenData) {
+            setError('Token inválido o expirado');
+            setIsLoading(false);
+            return;
+          }
 
-        // Actualizar el token a inactivo
-        // const { error: updateError } = await supabase
-        //   .from('token_logs')
-        //   .update({ is_active: false })
-        //   .eq('generated_token', token);
+          // Actualizar el token a inactivo
+          // const { error: updateError } = await supabase
+          //   .from('token_logs')
+          //   .update({ is_active: false })
+          //   .eq('generated_token', token);
+  
+          // if (updateError) {
+          //   throw new Error('Error al actualizar el estado del token');
+          // }
 
-        // if (updateError) {
-        //   throw new Error('Error al actualizar el estado del token');
-        // }
-
-        toast({
-          title: "Acceso validado",
-          description: "Token validado correctamente",
-          variant: "default",
-        });
-
-        setIsValid(true);
-        console.log('Inicio de sesión correcto');
-      } catch (err) {
-        setError('Error en la validación');
-        console.error('Error:', err);
-      } finally {
+          // Store session information in cookie
+          const sessionData = {
+            userId,
+            token,
+            timestamp: new Date().toISOString()
+          };
+          Cookies.set(SESSION_COOKIE_NAME, JSON.stringify(sessionData), { 
+            expires: SESSION_EXPIRY_DAYS,
+            secure: true,
+            sameSite: 'strict'
+          });
+  
+          toast({
+            title: "Acceso validado",
+            description: "Token validado correctamente",
+            variant: "default",
+          });
+  
+          setIsValid(true);
+          setElderId(userId);
+          console.log('Inicio de sesión correcto');
+        } catch (err) {
+          setError('Error en la validación');
+          console.error('Error:', err);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
         setIsLoading(false);
+        setIsValid(true);
       }
     };
 
@@ -114,9 +153,9 @@ const Index = () => {
       <div className="flex flex-col items-center justify-between min-h-screen bg-gradient-to-b from-black to-gray-900 text-white py-8 px-4">
         <div className="flex-1"></div>
         
-        <div className="flex flex-col items-center justify-center w-full max-w-md space-y-4">
+        <div className="flex flex-col items-center justify-center w-full max-w-xl space-y-4">
           <div className="text-center mb-4">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold mb-2 text-gradient-blue">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold mb-2 text-gradient-blue mt-10">
               ¡Hola! ¿Cómo puedo<br />ayudarte hoy?
             </h1>
             <p className="text-lg text-blue-300 mt-3">

@@ -47,8 +47,8 @@ const About = () => {
             If you have any questions or need support with Elder Voice Link, please don't hesitate to contact us.
           </p>
           <div className="text-elder-lg">
-            <p className="mb-2"><strong>Email:</strong> contact@eldervoicelink.com</p>
-            <p className="mb-2"><strong>Phone:</strong> (555) 123-4567</p>
+            <p className="mb-2"><strong>Email:</strong> contact@elderlink.life</p>
+            {/* <p className="mb-2"><strong>Phone:</strong> (555) 123-4567</p> */}
             <p><strong>Hours:</strong> Monday to Friday, 9am to 5pm EST</p>
           </div>
         </section>

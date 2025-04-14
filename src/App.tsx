@@ -31,7 +31,7 @@ const App = () => {
           null,
           createElement(Route, { path: "/", element: createElement(Index) }),
           createElement(Route, { path: "/about", element: createElement(About) }),
-          createElement(Route, { path: "/family", element: createElement(Family) }),
+          // createElement(Route, { path: "/family", element: createElement(Family) }),
           createElement(Route, { path: "*", element: createElement(NotFound) })
         )
       )

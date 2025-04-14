@@ -1,0 +1,42 @@
+const getEnvironment = () => {
+  const hostname = new URL(window.location.href).hostname;
+
+  if (hostname.includes("localhost")) return "localhost";
+  if (hostname.includes("staging")) return "staging";
+  if (hostname.includes("uat")) return "uat";
+  return "prod"; // Default to production if no specific environment is found
+};
+
+const config = {
+  environments: ["localhost", "staging", "uat", "prod"],
+  urls: {
+    n8n: {
+      localhost: "https://elder-link-staging-n8n.fwoasm.easypanel.host/webhook/1071408c-5504-4fa1-8fb9-c9d0e6199f6e",
+      staging: "https://elder-link-staging-n8n.fwoasm.easypanel.host/webhook/1071408c-5504-4fa1-8fb9-c9d0e6199f6e",
+      uat: "https://elder-link-staging-n8n.fwoasm.easypanel.host/webhook/1071408c-5504-4fa1-8fb9-c9d0e6199f6e",
+      prod: "https://n8n-pc98.onrender.com/webhook/76c09305-9123-4cfb-831e-4bceaa51a561",
+    },
+    api: {
+    },
+  },
+};
+
+const environment = getEnvironment();
+
+const safeEnvironment = config.environments.includes(environment) ? environment : "prod";
+
+// Export URLs based on the detected environment
+export const n8nWebhookUrl = config.urls.n8n[safeEnvironment];
+export const apiBaseUrl = config.urls.api[safeEnvironment];
+
+// Export environment information
+export const currentEnvironment = safeEnvironment;
+
+export const endpoints = {
+  n8n: {
+    webhook: n8nWebhookUrl,
+  },
+  api: {
+    baseUrl: apiBaseUrl,
+  },
+};
