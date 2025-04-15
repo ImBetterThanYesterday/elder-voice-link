@@ -11,9 +11,9 @@ const config = {
   environments: ["localhost", "staging", "uat", "prod"],
   urls: {
     n8n: {
-      localhost: "https://elder-link-staging-n8n.fwoasm.easypanel.host/webhook/1071408c-5504-4fa1-8fb9-c9d0e6199f6e",
-      staging: "https://elder-link-staging-n8n.fwoasm.easypanel.host/webhook/1071408c-5504-4fa1-8fb9-c9d0e6199f6e",
-      uat: "https://elder-link-staging-n8n.fwoasm.easypanel.host/webhook/1071408c-5504-4fa1-8fb9-c9d0e6199f6e",
+      localhost: "https://elder-link-staging-n8n.fwoasm.easypanel.host/webhook/76c09305-9123-4cfb-831e-4bceaa51a561",
+      staging: "https://elder-link-staging-n8n.fwoasm.easypanel.host/webhook/76c09305-9123-4cfb-831e-4bceaa51a561",
+      uat: "https://elder-link-staging-n8n.fwoasm.easypanel.host/webhook/76c09305-9123-4cfb-831e-4bceaa51a561",
       prod: "https://n8n-pc98.onrender.com/webhook/76c09305-9123-4cfb-831e-4bceaa51a561",
     },
     api: {
