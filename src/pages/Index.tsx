@@ -14,6 +14,11 @@ const DEFAULT_ELDER_ID = import.meta.env.VITE_ELDER_ID;
 const SESSION_COOKIE_NAME = "user_session";
 const SESSION_EXPIRY_DAYS = 7;
 
+type Elder = {
+  id: string;
+  full_name: string;
+};
+
 const Index = () => {
   const [searchParams] = useSearchParams();
   const [isValid, setIsValid] = useState(false);
@@ -23,6 +28,7 @@ const Index = () => {
   const [customWebhookUrl, setCustomWebhookUrl] = useState("");
   const [ttsPreference, setTtsPreference] = useState<'browser' | 'elevenlabs'>('browser');
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [elders, setElders] = useState<Elder[]>([]);
   const { toast } = useToast();
 
   // ElevenLabs API Key
@@ -78,6 +84,30 @@ const Index = () => {
     setDeferredPrompt(null);
   };
 
+  // Fetch elders from the database
+  useEffect(() => {
+    const fetchElders = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('elders')
+          .select('id, full_name')
+          .order('full_name');
+        
+        if (error) throw error;
+        setElders(data || []);
+      } catch (err) {
+        console.error('Error fetching elders:', err);
+        toast({
+          title: "Error",
+          description: "No se pudieron cargar los adultos mayores",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchElders();
+  }, [toast]);
+
   useEffect(() => {
     const validateParams = async () => {
       // Check for existing session cookie first
@@ -99,6 +129,8 @@ const Index = () => {
       if (currentEnvironment === "prod") {
         const token = searchParams.get("token");
         const userId = searchParams.get("userId");
+
+        console.log("data", token, userId);
 
         if (!token || !userId) {
           setError("Token y userId son requeridos");
@@ -236,16 +268,21 @@ const Index = () => {
                         htmlFor="elderId"
                         className="block text-sm font-medium text-gray-300 mb-2"
                       >
-                        ID del Adulto Mayor
+                        Seleccionar Adulto Mayor
                       </label>
-                      <input
-                        type="text"
+                      <select
                         id="elderId"
                         value={elderId}
                         onChange={(e) => setElderId(e.target.value)}
                         className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Ingrese el ID del adulto mayor"
-                      />
+                      >
+                        <option value="">Seleccione un adulto mayor</option>
+                        {elders.map((elder) => (
+                          <option key={elder.id} value={elder.id}>
+                            {elder.full_name} ({elder.id})
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label
