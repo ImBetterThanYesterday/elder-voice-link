@@ -8,7 +8,7 @@ import { currentEnvironment, endpoints } from "@/utils/endpoints";
 import { getTTSPreference, setTTSPreference } from "@/services/elevenlabs";
 import Cookies from "js-cookie";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Settings } from "lucide-react";
+import { Settings, Download } from "lucide-react";
 
 const DEFAULT_ELDER_ID = import.meta.env.VITE_ELDER_ID;
 const SESSION_COOKIE_NAME = "user_session";
@@ -22,6 +22,7 @@ const Index = () => {
   const [elderId, setElderId] = useState(DEFAULT_ELDER_ID);
   const [customWebhookUrl, setCustomWebhookUrl] = useState("");
   const [ttsPreference, setTtsPreference] = useState<'browser' | 'elevenlabs'>('browser');
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const { toast } = useToast();
 
   // ElevenLabs API Key
@@ -44,6 +45,37 @@ const Index = () => {
       variant: "default",
     });
     window.location.reload();
+  };
+
+  // Handle PWA installation
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      toast({
+        title: "¡Aplicación instalada!",
+        description: "La aplicación se ha instalado correctamente en tu dispositivo",
+        variant: "default",
+      });
+    }
+    
+    setDeferredPrompt(null);
   };
 
   useEffect(() => {
@@ -272,7 +304,16 @@ const Index = () => {
           />
         </div>
 
-        <div className="flex-1 flex items-end justify-center mt-8">
+        <div className="flex-1 flex flex-col items-center justify-end mt-8 space-y-4">
+          {deferredPrompt && (
+            <button
+              onClick={handleInstallClick}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Instalar aplicación
+            </button>
+          )}
           <p className="text-xs text-gray-400 opacity-70">
             Grand AI - Tu asistente personal, siempre aquí para ti
           </p>
