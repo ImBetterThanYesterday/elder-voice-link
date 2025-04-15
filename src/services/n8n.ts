@@ -3,10 +3,15 @@
  * Handles communication with the N8N endpoint
  */
 import { endpoints } from "../utils/endpoints";
-export const sendToN8N = async (text: string, elderId: string = "1e77cf24-ec07-4308-91e3-990675e00399"): Promise<string> => {
+
+export const sendToN8N = async (
+  text: string, 
+  elderId: string = "1e77cf24-ec07-4308-91e3-990675e00399",
+  webhookUrl?: string
+): Promise<string> => {
   try {
     const response = await fetch(
-      endpoints.n8n.webhook,
+      webhookUrl || endpoints.n8n.webhook,
       {
         method: "POST",
         headers: {

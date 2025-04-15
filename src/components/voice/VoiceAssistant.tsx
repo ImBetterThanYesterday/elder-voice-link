@@ -16,9 +16,10 @@ interface VoiceAssistantProps {
   apiKey: string;
   className?: string;
   elderId: string;
+  webhookUrl?: string;
 }
 
-const VoiceAssistant = ({ apiKey, className, elderId }: VoiceAssistantProps) => {
+const VoiceAssistant = ({ apiKey, className, elderId, webhookUrl }: VoiceAssistantProps) => {
   const [subtitleText, setSubtitleText] = useState('Toca el micrófono para comenzar a hablar conmigo');
   const [activeSpeech, setActiveSpeech] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -107,7 +108,7 @@ const VoiceAssistant = ({ apiKey, className, elderId }: VoiceAssistantProps) => 
         setSubtitleText('Procesando con Grand AI...');
         
         // Get AI response
-        const aiResponse = await sendToN8N(transcribedText, elderId);
+        const aiResponse = await sendToN8N(transcribedText, elderId, webhookUrl);
         
         if (aiResponse) {
           setChatHistory(prev => [...prev, {
@@ -144,7 +145,7 @@ const VoiceAssistant = ({ apiKey, className, elderId }: VoiceAssistantProps) => 
     } finally {
       setIsProcessing(false);
     }
-  }, [apiKey, toast, elderId]);
+  }, [apiKey, toast, elderId, webhookUrl]);
 
   const { isRecording, startRecording, stopRecording } = useVoiceRecording({
     onRecordingComplete: handleAudioProcessing
