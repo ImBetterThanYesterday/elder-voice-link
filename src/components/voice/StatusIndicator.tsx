@@ -25,7 +25,7 @@ const StatusIndicator = ({
 
       {isProcessing && (
         <div className="text-center text-blue-300 text-sm">
-          <span className="animate-pulse">Grand AI is thinking...</span>
+          <span className="animate-pulse">Link Voice is thinking...</span>
         </div>
       )}
 

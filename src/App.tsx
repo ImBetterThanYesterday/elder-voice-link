@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { createElement } from "react"; // Import createElement to avoid React hooks issues
 import Index from "./pages/Index";
 import About from "./pages/About";
+import Cache from "./pages/Cache";
 import NotFound from "./pages/NotFound";
 
 // Create a new QueryClient instance
@@ -29,6 +30,7 @@ const App = () => {
           null,
           createElement(Route, { path: "/", element: createElement(Index) }),
           createElement(Route, { path: "/about", element: createElement(About) }),
+          createElement(Route, { path: "/cache", element: createElement(Cache) }),
           createElement(Route, { path: "*", element: createElement(NotFound) })
         )
       )

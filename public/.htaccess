@@ -17,10 +17,26 @@ Header always set X-Content-Type-Options "nosniff"
     Header set Cache-Control "max-age=31536000, public"
 </FilesMatch>
 
+# Configuración de caché para HTML y JSON - evitar caché
+<FilesMatch "\.(html|json)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+</FilesMatch>
+
 # Configuración de caché para el service worker
-<Files "sw.js">
-    Header set Cache-Control "no-cache"
+<Files "service-worker.js">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
     Header set Service-Worker-Allowed "/"
+</Files>
+
+# Configuración de caché para el manifest
+<Files "manifest.json">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
 </Files>
 
 # Configuración de compresión

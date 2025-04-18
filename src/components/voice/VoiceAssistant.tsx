@@ -90,6 +90,7 @@ const VoiceAssistant = ({ apiKey, className, elderId, webhookUrl }: VoiceAssista
       setIsProcessing(true);
       setSubtitleText('Procesando tu mensaje...');
       
+      // TODO: implementar STT native web
       // Speech to text
       const transcribedText = await convertSpeechToText(audioBlob, apiKey);
       
@@ -105,7 +106,7 @@ const VoiceAssistant = ({ apiKey, className, elderId, webhookUrl }: VoiceAssista
         // Acknowledge user's message
         await speakText("Entiendo. Dame un momento para procesar tu solicitud.");
         
-        setSubtitleText('Procesando con Grand AI...');
+        setSubtitleText('Procesando con Link Voice...');
         
         // Get AI response
         const aiResponse = await sendToN8N(transcribedText, elderId, webhookUrl);
@@ -117,7 +118,7 @@ const VoiceAssistant = ({ apiKey, className, elderId, webhookUrl }: VoiceAssista
             timestamp: new Date()
           }]);
           
-          setSubtitleText('Grand AI está hablando...');
+          setSubtitleText('Link Voice está hablando...');
           
           // Speak the response, displaying subtitles
           await speakText(aiResponse);
