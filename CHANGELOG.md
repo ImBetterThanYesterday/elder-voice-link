@@ -21,4 +21,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - N/A
 
 ### Security
-- N/A 
+- N/A
+
+## [1.1.0] - 2024-03-22
+
+### Added
+- PWA download button implementation
+- Enhanced caching strategies and service worker functionality
+- Cache management page with manual cache clearing
+- Improved routing system
+- Enhanced elder selection in Index component
+
+### Changed
+- Optimized service worker for better offline support
+- Updated caching policies for HTML, JSON, and manifest files
+- Improved PWA update notification system 

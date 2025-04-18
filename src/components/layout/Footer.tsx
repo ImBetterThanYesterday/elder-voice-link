@@ -8,7 +8,7 @@ export const Footer = () => {
               support@elderlink.life
             </a>
           </p>
-          <p className="mt-1 md:mt-0 text-xs w-[200px]">Version 1.0.0</p>
+          <p className="mt-1 md:mt-0 text-xs w-[200px]">Version 1.1.0</p>
           <p className="w-[200px]">© {new Date().getFullYear()} Elder Voice Link</p>
         </div>
       </div>

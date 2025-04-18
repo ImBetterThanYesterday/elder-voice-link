@@ -1,7 +1,7 @@
 {
   "theme_color": "#38cdff",
   "background_color": "#2EC6FE",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "icons": [
     {
       "purpose": "maskable",
@@ -88,9 +88,9 @@
   "lang": "en",
   "name": "ElderLink Voice",
   "short_name": "Link Voice",
-  "start_url": "https://staging.elderlink.life",
-  "scope": "https://staging.elderlink.life",
-  "id": "https://staging.elderlink.life",
+  "start_url": "https://qa.elderlink.life",
+  "scope": "https://qa.elderlink.life",
+  "id": "https://qa.elderlink.life",
   "description": "Elder Link Connect helps seniors find and connect with caregivers, healthcare services, and community resources. Empowering elderly independence through technology.",
   "screenshots": [],
   "shortcuts": [],
